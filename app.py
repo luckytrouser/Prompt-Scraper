@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 
 # 페이지 설정
 st.set_page_config(page_title="Prompt Extractor", page_icon="🔍")
-st.markdown("## 🔍 프롬프트 추출기")
+st.markdown('<h1 style="font-size: 24px;">🔍 프롬프트 추출기</h1>', unsafe_allow_html=True)
 
 # 1. 입력 방식
 base_url = "https://cafe.daum.net/newsolomoon/O7LJ/"
