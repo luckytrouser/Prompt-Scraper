@@ -5,8 +5,8 @@ import re
 
 # 웹 페이지 제목 설정
 st.set_page_config(page_title="Prompt Extractor", page_icon="🔍")
-st.title("🔍 카페 프롬프트 추출기")
-st.markdown("다음 카페 게시글 주소를 입력하면 프롬프트만 쏙 뽑아드립니다.")
+st.title("🔍 프롬프트 추출기")
+st.markdown("주소를 입력하세요")
 
 # 입력창 (UI)
 test_url = st.text_input("카페 게시글 주소를 입력하세요", placeholder="https://cafe.daum.net/...")
