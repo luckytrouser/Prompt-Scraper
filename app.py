@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import re
-import streamlit.components.v1 as components
+from st_copy_to_clipboard import st_copy_to_clipboard
 
 # 페이지 설정
 st.set_page_config(page_title="Prompt Extractor", page_icon="🔍")
@@ -30,7 +30,16 @@ def extract_prompt_from_article(post_id):
         if not article_body: return None
         content_text = article_body.get_text(separator='\n')
         lines = content_text.split('\n')
-        extracted_prompts = [l.strip() for l in lines if len(l.strip()) > 50 and (len(re.findall(r'[a-zA-Z0-9\s\(\)\,\.\:\/]', l)) / len(l.strip()) > 0.8)]
+        
+        # 프롬프트 추출 로직
+        extracted_prompts = []
+        for l in lines:
+            line = l.strip()
+            if len(line) > 50:
+                eng_ratio = len(re.findall(r'[a-zA-Z0-9\s\(\)\,\.\:\/]', line)) / len(line)
+                if eng_ratio > 0.8:
+                    extracted_prompts.append(line)
+        
         return "\n".join(filter(None, extracted_prompts))
     except:
         return None
@@ -46,34 +55,20 @@ if st.button("프롬프트 추출하기"):
     else:
         st.error("글 번호를 입력하세요.")
 
-# 결과 표시 영역
+# 결과 표시 및 복사 영역
 if 'current_result' in st.session_state:
     st.divider()
-    res_col1, res_col2 = st.columns([4, 1])
+    res_col1, res_col2 = st.columns([4, 1.2])
+    
     with res_col1:
         st.subheader("✅ 추출 결과")
     
-    # --- 핵심: 자바스크립트 직접 주입 복사 버튼 ---
     with res_col2:
-        # 이스케이프 처리를 위해 결과값 정제
-        safe_result = st.session_state['current_result'].replace("`", "\\`").replace("$", "\\$")
-        
-        copy_button_html = f"""
-            <button id="copyBtn" style="
-                background-color: #ff4b4b; color: white; border: none; 
-                padding: 8px 16px; border-radius: 5px; cursor: pointer;
-                font-weight: bold; width: 100%;">Copy!</button>
-            <script>
-            document.getElementById('copyBtn').onclick = function() {{
-                const text = `{safe_result}`;
-                navigator.clipboard.writeText(text).then(() => {{
-                    window.parent.postMessage({{type: 'streamlit:toast', data: '복사되었습니다! ✅'}}, '*');
-                }}).catch(err => {{
-                    console.error('복사 실패:', err);
-                }});
-            }}
-            </script>
-        """
-        components.html(copy_button_html, height=45)
+        # 이 함수가 클릭 시 복사와 토스트 기능을 동시에 수행합니다.
+        st_copy_to_clipboard(
+            st.session_state['current_result'], 
+            before_text="Copy!", 
+            after_text="Copied! ✅"
+        )
 
     st.text_area(label="Result", value=st.session_state['current_result'], height=300, label_visibility="collapsed")
