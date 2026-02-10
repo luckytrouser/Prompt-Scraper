@@ -1,4 +1,6 @@
+st-copy-to-clipboard
+streamlit
 requests
 beautifulsoup4
-streamlit
-st-copy-to-clipboard
+gspread
+google-auth
